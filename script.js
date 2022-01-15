@@ -96,7 +96,7 @@ async function loadProducts() {
   const itemsList = document.querySelector('.items');
   const products = await fetchProducts('computador');
   products.results
-    .filter((_, index) => index <= 7)
+    .filter((_, index) => index <= 50)
     .forEach((product) => {
       const element = createProductItemElement(product);
       itemsList.appendChild(element);
@@ -105,6 +105,9 @@ async function loadProducts() {
 
 window.onload = () => {
   loadProducts();
-  getSavedCartItems().forEach((sku) => appendCartItemELement(sku));
+  const itemsStored = getSavedCartItems();
+  if (itemsStored) {
+    itemsStored.forEach((sku) => appendCartItemELement(sku));
+  }
   emptyCart();
 };
