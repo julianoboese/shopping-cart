@@ -1,3 +1,5 @@
+const cartList = document.querySelector('.cart__items');
+
 function createProductImageElement(imageSource) {
   const img = document.createElement('img');
   img.className = 'item__image';
@@ -17,20 +19,24 @@ function getSkuFromProductItem(item) {
 }
 
 async function updatePrice(sku, remove) {
-  const product = await fetchItem(sku);
-  const { price } = product;
-  console.log(product);
   const totalElement = document.querySelector('.total-price');
-  const currentTotal = parseFloat(totalElement.innerText.replace('.', '').replace(',', '.'));
-  const total = !remove ? currentTotal + price : currentTotal - price;
-  const newTotal = parseFloat(total.toFixed(2)).toLocaleString('pt-BR', {
-    minimumFractionDigits: 2,
-  });
-  totalElement.innerText = newTotal;
+  if (!sku) {
+    totalElement.innerText = '0,00';
+  } else {
+    const product = await fetchItem(sku);
+    const { price } = product;
+    const currentTotal = parseFloat(
+      totalElement.innerText.replace('.', '').replace(',', '.'),
+    );
+    const total = !remove ? currentTotal + price : currentTotal - price;
+    const newTotal = parseFloat(total.toFixed(2)).toLocaleString('pt-BR', {
+      minimumFractionDigits: 2,
+    });
+    totalElement.innerText = newTotal;
+  }
 }
 
 function cartItemClickListener(event) {
-  const cartList = document.querySelector('.cart__items');
   const skuToRemove = event.target.id;
   cartList.removeChild(event.target);
   updatePrice(skuToRemove, 'remove');
@@ -47,7 +53,6 @@ function createCartItemElement({ id: sku, title: name, price: salePrice }) {
 }
 
 async function appendCartItemELement(sku) {
-  const cartList = document.querySelector('.cart__items');
   const productToAdd = await fetchItem(sku);
   const cartElement = createCartItemElement(productToAdd);
   cartList.appendChild(cartElement);
@@ -78,6 +83,15 @@ function createProductItemElement({ id: sku, title: name, thumbnail: image }) {
   return section;
 }
 
+function emptyCart() {
+  const emptyButton = document.querySelector('.empty-cart');
+  emptyButton.addEventListener('click', () => {
+    cartList.innerHTML = '';
+    updatePrice(null, 'remove');
+    saveCartItems(null, 'remove');
+  });
+}
+
 async function loadProducts() {
   const itemsList = document.querySelector('.items');
   const products = await fetchProducts();
@@ -92,4 +106,5 @@ async function loadProducts() {
 window.onload = () => {
   loadProducts();
   getSavedCartItems().forEach((sku) => appendCartItemELement(sku));
+  emptyCart();
 };
