@@ -94,8 +94,8 @@ function emptyCart() {
 
 async function loadProducts() {
   const itemsList = document.querySelector('.items');
-  const products = await fetchProducts();
-  products
+  const products = await fetchProducts('computador');
+  products.results
     .filter((_, index) => index <= 7)
     .forEach((product) => {
       const element = createProductItemElement(product);
