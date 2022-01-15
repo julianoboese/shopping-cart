@@ -16,16 +16,31 @@ function getSkuFromProductItem(item) {
   return item.querySelector('span.item__sku').innerText;
 }
 
+async function updatePrice(sku, remove) {
+  const product = await fetchItem(sku);
+  const { price } = product;
+  console.log(product);
+  const totalElement = document.querySelector('.total-price');
+  const currentTotal = parseFloat(totalElement.innerText.replace('.', '').replace(',', '.'));
+  const total = !remove ? currentTotal + price : currentTotal - price;
+  const newTotal = parseFloat(total.toFixed(2)).toLocaleString('pt-BR', {
+    minimumFractionDigits: 2,
+  });
+  totalElement.innerText = newTotal;
+}
+
 function cartItemClickListener(event) {
   const cartList = document.querySelector('.cart__items');
-  const skuToRemove = event.target.innerText.slice(5, 18);
+  const skuToRemove = event.target.id;
   cartList.removeChild(event.target);
+  updatePrice(skuToRemove, 'remove');
   saveCartItems(skuToRemove, 'remove');
 }
 
 function createCartItemElement({ id: sku, title: name, price: salePrice }) {
   const li = document.createElement('li');
   li.className = 'cart__item';
+  li.id = sku;
   li.innerText = `SKU: ${sku} | NAME: ${name} | PRICE: $${salePrice}`;
   li.addEventListener('click', cartItemClickListener);
   return li;
@@ -36,6 +51,7 @@ async function appendCartItemELement(sku) {
   const productToAdd = await fetchItem(sku);
   const cartElement = createCartItemElement(productToAdd);
   cartList.appendChild(cartElement);
+  updatePrice(sku);
 }
 
 function productClickListener(event) {
@@ -62,7 +78,7 @@ function createProductItemElement({ id: sku, title: name, thumbnail: image }) {
   return section;
 }
 
-const loadProducts = async () => {
+async function loadProducts() {
   const itemsList = document.querySelector('.items');
   const products = await fetchProducts();
   products
@@ -71,7 +87,7 @@ const loadProducts = async () => {
       const element = createProductItemElement(product);
       itemsList.appendChild(element);
     });
-};
+}
 
 window.onload = () => {
   loadProducts();
