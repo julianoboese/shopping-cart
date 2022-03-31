@@ -1,5 +1,5 @@
 function localStorageSimulator(key) {
-  Object.defineProperty(window, 'localStorage', {
+  Object.defineProperty(global, 'localStorage', {
     value: {
       [key]: jest.fn(),
     },

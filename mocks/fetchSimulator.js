@@ -9,7 +9,7 @@ const ENDPOINTS = {
 const TIME_IN_MILLISECONDS = 200;
 
 const fetchSimulator = (url) => {
-  if (typeof url === undefined || url.endsWith('undefined')) {
+  if (typeof url === 'undefined' || url.endsWith('undefined')) {
     return Promise.reject(new Error('You must provide an url'));
   }
   const validUrl = Object.values(ENDPOINTS).includes(url);
@@ -32,7 +32,7 @@ const fetchSimulator = (url) => {
   });
 };
 
-window.fetch = jest.fn(fetchSimulator);
+global.fetch = jest.fn(fetchSimulator);
 afterEach(jest.clearAllMocks);
 
 module.exports = fetchSimulator;
